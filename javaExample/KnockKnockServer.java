@@ -28,7 +28,7 @@ public class KnockKnockServer {
         String inputLine, outputLine;
         KnockKnockProtocol kkp = new KnockKnockProtocol();
 
-        outputLine = kkp.processInput(null);
+		outputLine = kkp.processInput(null);
         out.println(outputLine);
 
         while ((inputLine = in.readLine()) != null) {
