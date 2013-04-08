@@ -5,7 +5,7 @@ import java.text.*;
 import javax.swing.*;
 
 public class HttpHandler implements Runnable {
-	String CRLF = "\r\n";  // this is specifically used in the HTTP protocol
+	String CRLF = "\r\n";  // this is specifically used in the HTTP protocols
 	Socket socket;
 
 	public HttpHandler(Socket socket) throws Exception 
