@@ -3,7 +3,7 @@
 import java.net.*;
 import java.io.*;
 
-public class KnockKnockProtocol {
+public class ChatHandler implements Runnable{
 
     public String processInput(String theInput) {
     	
@@ -12,4 +12,10 @@ public class KnockKnockProtocol {
         return theInput;
 
     }
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		
+	}
 }

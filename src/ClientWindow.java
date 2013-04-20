@@ -3,9 +3,9 @@ import java.awt.FlowLayout;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class KnockKnockClientWindow extends JFrame {
+public class ClientWindow extends JFrame {
 
-	public KnockKnockClientWindow() {
+	public ClientWindow() {
 		initUI();
 	}
 

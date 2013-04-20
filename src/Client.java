@@ -1,14 +1,14 @@
 import java.io.*;
 import java.net.*;
 
-public class KnockKnockClient {
+public class Client {
 	public static void main(String[] args) throws IOException {
 
 		Socket kkSocket = null;
 		PrintWriter out = null;
 		BufferedReader in = null;
 
-		int port = 4444;
+		int port = 4445;
 
 		try {
 			kkSocket = new Socket("localhost", port);
@@ -36,11 +36,12 @@ public class KnockKnockClient {
 
 			fromUser = stdIn.readLine();
 			if (fromUser != null) {
-				//System.out.println("Client: " + fromUser);
+				// System.out.println("Client: " + fromUser);
 				out.println(fromUser);
 			}
 		}
-
+		
+		fromUser = "Bye.";
 		out.close();
 		in.close();
 		stdIn.close();
