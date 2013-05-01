@@ -10,18 +10,12 @@ public class Server {
 		Socket clientSocket = null;
 		boolean serverIsRunning = true;
 		
-		
-		
-		
-		
 		try {
 			serverSocket = new ServerSocket(port);
 		} catch (IOException e) {
 			System.err.println("Could not listen on port: " + port + ".");
 			System.exit(1);
 		}
-
-		(new Thread(new ChatHandler())).start();
 		
 		while (serverIsRunning) {
 
