@@ -73,16 +73,18 @@ public class Client
 		Socket kkSocket = null;
 		PrintWriter out = null;
 		BufferedReader in = null;
-
+		String host = "localhost";
+		String fromServer, fromUser;
+		
 		int port = 4445;
 
 		try {
-			kkSocket = new Socket("localhost", port);
+			kkSocket = new Socket(host, port);
 			out = new PrintWriter(kkSocket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(
 					kkSocket.getInputStream()));
 		} catch (UnknownHostException e) {
-			System.err.println("Don't know about host: taranis.");
+			System.err.println("Don't know about host: \"" + host +  "\".");
 			System.exit(1);
 		} catch (IOException e) {
 			System.err
@@ -92,9 +94,7 @@ public class Client
 
 		BufferedReader stdIn = new BufferedReader(new InputStreamReader(
 				System.in));
-		String fromServer;
-		String fromUser;
-
+		
 		while ((fromServer = in.readLine()) != null) {
 			System.out.println("Server: " + fromServer);
 			if (fromServer.equals("Bye."))
@@ -102,7 +102,6 @@ public class Client
 
 			fromUser = stdIn.readLine();
 			if (fromUser != null) {
-				// System.out.println("Client: " + fromUser);
 				out.println(fromUser);
 			}
 		}
