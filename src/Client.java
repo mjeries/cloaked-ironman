@@ -5,13 +5,13 @@ public class Client
 {
 	//drew integration..
 	private String server, username;
-	private ClientGUI cg;
+	private ChatLog cg;
 	private int port;
 	private ObjectOutputStream sOutput;
 	private ObjectInputStream sInput;
 	private Socket socket;
 
-	public Client(String server, int port, String username, ClientGUI cg)
+	public Client(String server, int port, String username, ChatLog cg)
 	{
 		this.server = server;
 		this.port = port;

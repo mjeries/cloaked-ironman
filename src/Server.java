@@ -11,6 +11,7 @@ public class Server {
 		boolean serverIsRunning = true;
 		
 		try {
+			System.out.println("Starting up server... \n");
 			serverSocket = new ServerSocket(port);
 		} catch (IOException e) {
 			System.err.println("Could not listen on port: " + port + ".");
@@ -20,7 +21,9 @@ public class Server {
 		while (serverIsRunning) {
 
 			try {
+				System.out.println("Waiting for connection... \n");
 				clientSocket = serverSocket.accept();
+				System.out.println("Welcome to our chat at: "+clientSocket.getInetAddress().getHostName());
 				(new Thread(new ConnectionHandler(clientSocket))).start();
 			} catch (IOException e) {
 				System.err.println("Accept failed.");

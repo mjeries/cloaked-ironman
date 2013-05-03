@@ -7,7 +7,7 @@ import java.awt.event.*;
 /*
  * The Client with its GUI
  */
-public class ClientGUI extends JFrame implements ActionListener {
+public class ChatLog extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
 	// will first hold "Username:", later on "Enter message"
@@ -29,7 +29,7 @@ public class ClientGUI extends JFrame implements ActionListener {
 	private String defaultHost;
 
 	// Constructor connection receiving a socket number
-	ClientGUI(String host, int port) {
+	ChatLog(String host, int port) {
 
 		super("Chat Client");
 		defaultPort = port;
@@ -182,7 +182,7 @@ public class ClientGUI extends JFrame implements ActionListener {
 
 	// to start the whole thing
 	public static void main(String[] args) {
-		new ClientGUI("localhost", 8092);
+		new ChatLog("localhost", 8092);
 	}
 
 }
