@@ -15,6 +15,7 @@ import java.util.Date;
  */
 
 public class Server {
+<<<<<<< HEAD
 
 	static int port = 4445;
 	static String host = "localhost";
@@ -45,6 +46,16 @@ public class Server {
 
 	public static void sendMessage(String string) {
 
+=======
+	public static void main(String[] args) throws IOException {
+
+		int port = 4445;
+
+		ServerSocket serverSocket = null;
+		Socket clientSocket = null;
+		boolean serverIsRunning = true;
+		
+>>>>>>> b3fc46a1cd7490721919e6bb57f726ccd1fe817b
 		try {
 			for (PrintWriter writer : writers) {
 				writer.println(string);
@@ -53,6 +64,7 @@ public class Server {
 			System.err.println("Collection modified while iterating through");
 			sendMessage(string);
 		}
+<<<<<<< HEAD
 	}
 
 	// one handler for each client
@@ -71,6 +83,10 @@ public class Server {
 		public void run() {
 
 			System.out.println("New connection accepted");
+=======
+		
+		while (serverIsRunning) {
+>>>>>>> b3fc46a1cd7490721919e6bb57f726ccd1fe817b
 
 			try {
 				in = new BufferedReader(new InputStreamReader(
