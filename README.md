@@ -8,8 +8,6 @@ TODO
 ====
 
 1. Finish Client / Server implementation
-2. GUI
-  a. swing
-  b. one box for typing messages, another for chat log
+2. GUI  - finished?
 3. Video
-4. Encryption
+4. Encryption - finished?
