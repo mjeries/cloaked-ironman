@@ -87,7 +87,7 @@ public class Server {
 
 		public void run() {
 
-			System.out.println("New connection accepted " + date.format(now));
+			System.out.println(System.currentTimeMillis() + ": New connection accepted " + socket.getRemoteSocketAddress().toString());
 
 			try {
 				in = new BufferedReader(new InputStreamReader(
@@ -172,7 +172,7 @@ public class Server {
 				if (name == null) {
 					System.err.println("Name Error");
 				} else if (e.getMessage() == "Connection reset") {
-					System.out.println("A client disconnected");
+					System.out.println(System.currentTimeMillis() + ": A client disconnected " + socket.getRemoteSocketAddress().toString());
 				} else {
 					e.printStackTrace();
 
