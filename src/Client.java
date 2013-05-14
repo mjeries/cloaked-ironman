@@ -101,15 +101,14 @@ public class Client {
 				"Screen name selection", JOptionPane.PLAIN_MESSAGE);
 	}
 
-	private void sendMessage(String string){
+	private void sendMessage(String string) {
 		out.println(string);
 	}
-	
-	private static void sendEncrypted(String string){
+
+	private static void sendEncrypted(String string) {
 		out.println(Encryption.encrypt(string, symKeyHex));
 	}
-	
-	
+
 	/**
 	 * Connects to the server then enters the processing loop.
 	 */
@@ -132,7 +131,7 @@ public class Client {
 				// line = in.readLine(); //old version
 				if (line.startsWith("SUBMITNAME")) {
 					sendEncrypted(getName());
-					//out.println(getName());	//old
+					// out.println(getName()); //old
 				} else if (line.startsWith("NAMEACCEPTED")) {
 					textField.setEditable(true);
 				} else if (line.startsWith("MESSAGE")) {
@@ -201,14 +200,14 @@ public class Client {
 
 				if (inputmessage.startsWith("exit")) {
 					sendEncrypted("<DISCONNECT>");
-					//out.println("<DISCONNECT>"); //old
+					// out.println("<DISCONNECT>"); //old
 					running = false;
 				}
 
 				if (inputmessage.startsWith("me")) {
 					inputmessage = inputmessage.substring(2).trim();
 					sendEncrypted("<ME> " + inputmessage);
-					//out.println("<ME> " + inputmessage);	//old
+					// out.println("<ME> " + inputmessage); //old
 				}
 				if (inputmessage.startsWith("help")) {
 					inputmessage = inputmessage.substring(4).trim();
@@ -219,22 +218,21 @@ public class Client {
 					messageArea.append(" result: \"* bob waves hello\"\n");
 
 				}
-				if (inputmessage.startsWith("list")){
+				if (inputmessage.startsWith("list")) {
 					sendEncrypted("<LISTUSERS>");
-					//out.println("<LISTUSERS>");	//old
+					// out.println("<LISTUSERS>"); //old
 				}
 			} else { // otherwise we just send the message to the encryption
 						// class.
 
 				sendEncrypted(inputmessage);
-				
-				//out.println(inputmessage);	//old
+
+				// out.println(inputmessage); //old
 
 				// out.println(textField.getText()); //older version
 			}
 
 		}
-		
-		
+
 	}
 }
