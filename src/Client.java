@@ -1,4 +1,5 @@
 //new
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -13,6 +14,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.text.DefaultCaret;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -32,18 +34,17 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
  */
 public class Client {
 
-	//hardcoded key :(
+	// hardcoded key :(
 	public static final String symKeyHex = "000102030405060708090A0B0C0D0E0F";
 	BufferedReader in;
 	static PrintWriter out;
 	JFrame frame = new JFrame("Cloaked Iron");
-	static JTextField textField = new JTextField(40);
-	JTextArea messageArea = new JTextArea(8, 40);
+	static JTextField textField = new JTextField(45);
+	static JTextArea messageArea = new JTextArea(8, 40);
 	static ChatHandler ch = new ChatHandler();
 	static Encryption enc = new Encryption();
 	static boolean running = true;
-	
-	
+	static JScrollPane scrollPane = new JScrollPane(messageArea);
 
 	/**
 	 * Constructs the client by laying out the GUI and registering a listener
@@ -59,6 +60,12 @@ public class Client {
 		messageArea.setEditable(false);
 		frame.getContentPane().add(textField, "South");
 		frame.getContentPane().add(new JScrollPane(messageArea), "Center");
+		scrollPane
+				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane
+				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		messageArea.setLineWrap(true);
+
 		frame.pack();
 
 		// Add Listeners
@@ -82,7 +89,7 @@ public class Client {
 	 */
 	private String getServerAddress() {
 		return JOptionPane.showInputDialog(frame,
-				"Enter IP Address of the Server:", "Welcome to the Chatter",
+				"Enter IP Address of the Server:", "Welcome to the Chatroom",
 				JOptionPane.QUESTION_MESSAGE);
 	}
 
@@ -97,33 +104,45 @@ public class Client {
 	/**
 	 * Connects to the server then enters the processing loop.
 	 */
-	private void run() throws IOException {
+	private void run() {
 
-		// Make connection and initialize streams
-		String serverAddress = getServerAddress();
-		Socket socket = new Socket(serverAddress, 4445);
-		in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		out = new PrintWriter(socket.getOutputStream(), true);
+		try {
 
-		// Process all messages from server, according to the protocol.
-		String line;
-		
-		while (running) {
-			line = enc.decrypt(in.readLine(), symKeyHex);
-			//line = in.readLine();		//old version
-			if (line.startsWith("SUBMITNAME")) {
-				out.println(getName());
-			} else if (line.startsWith("NAMEACCEPTED")) {
-				textField.setEditable(true);
-			} else if (line.startsWith("MESSAGE")) {
-				messageArea.append(line.substring(8) + "\n");
-			} else if (line.startsWith("SERVERSHUTDOWN")) {
-				closeClient(socket);
-			} else if (line.startsWith("TRANSFERFILE")) {
+			// Make connection and initialize streams
+			String serverAddress = getServerAddress();
+			Socket socket = new Socket(serverAddress, 4445);
+			in = new BufferedReader(new InputStreamReader(
+					socket.getInputStream()));
+			out = new PrintWriter(socket.getOutputStream(), true);
 
+			// Process all messages from server, according to the protocol.
+			String line;
+
+			while (running) {
+				line = enc.decrypt(in.readLine(), symKeyHex);
+				// line = in.readLine(); //old version
+				if (line.startsWith("SUBMITNAME")) {
+					out.println(getName());
+				} else if (line.startsWith("NAMEACCEPTED")) {
+					textField.setEditable(true);
+				} else if (line.startsWith("MESSAGE")) {
+					messageArea.append(line.substring(8) + "\n");
+					messageArea.setCaretPosition(messageArea.getDocument()
+							.getLength());
+				} else if (line.startsWith("SERVERSHUTDOWN")) {
+					closeClient(socket);
+				}
+			}
+			closeClient(socket);
+
+		} catch (IOException e) {
+			if (e.getMessage() == "Stream closed") {
+				System.out
+						.println("The server shut down. (Error: \"Stream closed.\")");
+			} else {
+				e.printStackTrace();
 			}
 		}
-		closeClient(socket);
 	}
 
 	public void closeClient(Socket socket) {
@@ -132,6 +151,7 @@ public class Client {
 			out.close();
 			in.close();
 			socket.close();
+			System.exit(0);
 		} catch (IOException e) {
 			System.err
 					.println("Couldn't get I/O for the connection to: taranis.");
@@ -143,7 +163,7 @@ public class Client {
 	 * Runs the client as an application with a closeable frame.
 	 */
 	public static void main(String[] args) throws Exception {
-		
+
 		Security.addProvider(new BouncyCastleProvider());
 
 		Client client = new Client();
@@ -171,24 +191,30 @@ public class Client {
 
 				if (inputmessage.startsWith("exit")) {
 					out.println("<DISCONNECT>");
-					//out.println(enc.encrypt("<DISCONNECT>", symKeyHex));
+					// out.println(enc.encrypt("<DISCONNECT>", symKeyHex));
 					running = false;
 				}
 
 				if (inputmessage.startsWith("me")) {
 					inputmessage = inputmessage.substring(2).trim();
-					out.println("<ME>" + inputmessage);
-					//out.println(enc.encrypt("<ME>" + inputmessage, symKeyHex));
+					out.println("<ME> " + inputmessage);
+					// out.println(enc.encrypt("<ME>" + inputmessage,
+					// symKeyHex));
 				}
-
+				if (inputmessage.startsWith("help")) {
+					inputmessage = inputmessage.substring(4).trim();
+					out.println("<ME>" + inputmessage);
+					// out.println(enc.encrypt("<ME>" + inputmessage,
+					// symKeyHex));
+				}
 			} else { // otherwise we just send the message to the encryption
 						// class.
 
 				out.println(inputmessage);
-				//out.println(enc.encrypt(inputmessage, symKeyHex));	//encyption version
-				
-				
-				// out.println(textField.getText());	//older version
+				// out.println(enc.encrypt(inputmessage, symKeyHex));
+				// //encyption version
+
+				// out.println(textField.getText()); //older version
 			}
 
 		}

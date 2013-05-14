@@ -18,8 +18,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
  * Adapted from http://cs.lmu.edu/~ray/notes/javanetexamples/
- * 
- * 
  */
 
 public class Server {
@@ -44,6 +42,8 @@ public class Server {
 		server = new ServerSocket(port);
 
 		console.start();
+		
+		System.out.println("Ready.");
 
 		try {
 			while (serverRunning) {
@@ -62,7 +62,7 @@ public class Server {
 		try {
 			for (PrintWriter writer : writers) {
 				//writer.println(string);
-				writer.println(enc.encrypt(string, symKeyHex));	//encryption version
+				writer.println(Encryption.encrypt(string, symKeyHex));	//encryption version
 			}
 		} catch (ConcurrentModificationException e) {
 			System.err.println("Collection modified while iterating through");
@@ -71,7 +71,7 @@ public class Server {
 	}
 
 	// one handler for each client
-	private static class ConnectionHandler extends Thread {
+	static class ConnectionHandler extends Thread {
 
 		private static SimpleDateFormat date = new SimpleDateFormat(
 				"yyyy.MM.dd HH:mm:ss.SS");
@@ -80,6 +80,7 @@ public class Server {
 		private BufferedReader in;
 		private PrintWriter out;
 		private static Date now = new Date();
+		boolean chRunning = true;
 
 		public ConnectionHandler(Socket socketIn) {
 			this.socket = socketIn;
@@ -100,7 +101,7 @@ public class Server {
 			try {
 				while (true) {
 
-					out.println(enc.encrypt("SUBMITNAME", symKeyHex));
+					out.println(Encryption.encrypt("SUBMITNAME", symKeyHex));
 					//out.println("SUBMITNAME");	//this is the old version for the line above
 					
 					//name = enc.decrypt(in.readLine(), symKeyHex);
@@ -109,14 +110,14 @@ public class Server {
 						return;
 					}
 					synchronized (names) {
-						if (!names.contains(name)) {
+						if (!names.contains(name) && name != "Server") {
 							names.add(name);
 							break;
 						}
 					}
 				}
 				
-				out.println(enc.encrypt("NAMEACCEPTED", symKeyHex));
+				out.println(Encryption.encrypt("NAMEACCEPTED", symKeyHex));
 				//out.println("NAMEACCEPTED");		//this is the old version for the line above
 				System.out.println("Added client: " + name);
 				writers.add(out);
@@ -124,7 +125,7 @@ public class Server {
 
 				String input;
 				
-				while (true) {
+				while (chRunning) {
 					
 					//input = enc.decrypt(in.readLine(), symKeyHex);	//encryption version here
 					input = in.readLine();	//old version here
@@ -133,10 +134,14 @@ public class Server {
 						return;
 					}
 
-					if (input == "<DISCONNECT>") {
+					if (input.startsWith("<DISCONNECT>")) {
+						
+						chRunning = false;
+						sendMessage("MESSAGE Server: " + name + " has disconnected.");
 						break;
-					} else if (input == "<ME>") {
-						sendMessage("MESSAGE " + name + " has disconnected.");
+					} else if (input.startsWith("<ME>")) {
+						input = input.substring(4);
+						sendMessage("MESSAGE *" + name + input);
 					} else {
 						sendMessage("MESSAGE " + name + ": " + input);
 
@@ -161,6 +166,9 @@ public class Server {
 		}
 
 		private void closeConnection() {
+			
+			names.remove(name);
+			
 			out.flush();
 			out.close();
 
@@ -223,6 +231,10 @@ public class Server {
 			}
 		}
 
+		/** Used mainly for debugging, allows you to write anything
+		 * directly to every user, no protocol.
+		 * @param args2 what you want to broadcast.
+		 */
 		private void rawWrite(String args2) {
 
 			if (args2.startsWith("-")) {
@@ -249,10 +261,11 @@ public class Server {
 		}
 
 		// prints out info about the user (time only for now)
+		@SuppressWarnings("static-access")
 		private void queryUser(String args2) {
-
+			
 			// prints out when the client was created
-			System.out.println(table.get(args2).getCreationTime());
+			System.out.println(args2 + ": " + table.get(args2).getCreationTime());
 		}
 
 		private void listClients() {
