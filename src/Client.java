@@ -101,6 +101,15 @@ public class Client {
 				"Screen name selection", JOptionPane.PLAIN_MESSAGE);
 	}
 
+	private void sendMessage(String string){
+		out.println(string);
+	}
+	
+	private static void sendEncrypted(String string){
+		out.println(Encryption.encrypt(string, symKeyHex));
+	}
+	
+	
 	/**
 	 * Connects to the server then enters the processing loop.
 	 */
@@ -119,10 +128,11 @@ public class Client {
 			String line;
 
 			while (running) {
-				line = enc.decrypt(in.readLine(), symKeyHex);
+				line = Encryption.decrypt(in.readLine(), symKeyHex);
 				// line = in.readLine(); //old version
 				if (line.startsWith("SUBMITNAME")) {
-					out.println(getName());
+					sendEncrypted(getName());
+					//out.println(getName());	//old
 				} else if (line.startsWith("NAMEACCEPTED")) {
 					textField.setEditable(true);
 				} else if (line.startsWith("MESSAGE")) {
@@ -190,33 +200,41 @@ public class Client {
 				inputmessage = inputmessage.substring(1);
 
 				if (inputmessage.startsWith("exit")) {
-					out.println("<DISCONNECT>");
-					// out.println(enc.encrypt("<DISCONNECT>", symKeyHex));
+					sendEncrypted("<DISCONNECT>");
+					//out.println("<DISCONNECT>"); //old
 					running = false;
 				}
 
 				if (inputmessage.startsWith("me")) {
 					inputmessage = inputmessage.substring(2).trim();
-					out.println("<ME> " + inputmessage);
-					// out.println(enc.encrypt("<ME>" + inputmessage,
-					// symKeyHex));
+					sendEncrypted("<ME> " + inputmessage);
+					//out.println("<ME> " + inputmessage);	//old
 				}
 				if (inputmessage.startsWith("help")) {
 					inputmessage = inputmessage.substring(4).trim();
-					out.println("<ME>" + inputmessage);
-					// out.println(enc.encrypt("<ME>" + inputmessage,
-					// symKeyHex));
+					messageArea.append("Client Commands\n");
+					messageArea.append("/exit : Disconnect and close\n");
+					messageArea.append("/list : Show users online\n");
+					messageArea.append("/me   : Example: /me waves hello\n");
+					messageArea.append(" result: \"* bob waves hello\"\n");
+
+				}
+				if (inputmessage.startsWith("list")){
+					sendEncrypted("<LISTUSERS>");
+					//out.println("<LISTUSERS>");	//old
 				}
 			} else { // otherwise we just send the message to the encryption
 						// class.
 
-				out.println(inputmessage);
-				// out.println(enc.encrypt(inputmessage, symKeyHex));
-				// //encyption version
+				sendEncrypted(inputmessage);
+				
+				//out.println(inputmessage);	//old
 
 				// out.println(textField.getText()); //older version
 			}
 
 		}
+		
+		
 	}
 }

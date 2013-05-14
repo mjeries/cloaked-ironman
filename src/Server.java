@@ -104,8 +104,8 @@ public class Server {
 					out.println(Encryption.encrypt("SUBMITNAME", symKeyHex));
 					//out.println("SUBMITNAME");	//this is the old version for the line above
 					
-					//name = enc.decrypt(in.readLine(), symKeyHex);
-					name = in.readLine();		//this is the old version for the line above
+					name = Encryption.decrypt(in.readLine(), symKeyHex);
+					//name = in.readLine();		//this is the old version for the line above
 					if (name == null) {
 						return;
 					}
@@ -122,13 +122,15 @@ public class Server {
 				System.out.println("Added client: " + name);
 				writers.add(out);
 				table.put(name, this);
+				
+				sendMessage(name + " has connected.");
 
 				String input;
 				
 				while (chRunning) {
 					
-					//input = enc.decrypt(in.readLine(), symKeyHex);	//encryption version here
-					input = in.readLine();	//old version here
+					input = Encryption.decrypt(in.readLine(), symKeyHex);	//encryption version here
+					//input = in.readLine();	//old version here
 					
 					if (input == null) {
 						return;
@@ -142,7 +144,17 @@ public class Server {
 					} else if (input.startsWith("<ME>")) {
 						input = input.substring(4);
 						sendMessage("MESSAGE *" + name + input);
-					} else {
+						
+					} else if (input.startsWith("<LISTUSERS>")){
+						String userList = "";
+						
+						for (String user : names) {
+							userList = userList + user + "\t";
+						}
+						sendMessage("MESSAGE Server: Connected Users\n" + userList);
+					}
+					
+					else {
 						sendMessage("MESSAGE " + name + ": " + input);
 
 					}
@@ -154,7 +166,7 @@ public class Server {
 				if (name == null) {
 					System.err.println("Name Error");
 				} else if (e.getMessage() == "Connection reset") {
-					System.out.println("a client disconnected");
+					System.out.println("A client disconnected");
 				} else {
 					e.printStackTrace();
 
@@ -185,6 +197,8 @@ public class Server {
 			return date.format(now);
 		}
 
+		
+		
 	}
 
 	private static class ServerConsole extends Thread {
